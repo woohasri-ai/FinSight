@@ -1,0 +1,42 @@
+
+[project]
+name = "finsight"
+version = "0.1.0"
+description = "Agentic RAG and text-to-SQL financial analyst for Indian IT annual reports"
+requires-python = ">=3.11,<3.12"
+dependencies = [
+    "pymupdf>=2.0",
+    "rank-bm25>=0.2.2",
+    "sentence-transformers>=6.2.0",
+    "tokenizers>=0.23.3",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0",
+    "ruff>=0.17",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+only-include = ["src/finsight"]
+sources = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-ra"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"

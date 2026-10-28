@@ -1,0 +1,94 @@
+[
+  {
+    "id": "TCS-RET-001",
+    "question": "What are TCS's five strategic pillars for AI-led transformation?",
+    "source_doc": "tcs_annual_report_2025_26.pdf",
+    "expected_pages": [54],
+    "relevant_chunk_ids": [
+      "tcs_annual_report_2025_26.pdf:page-54:chunk-2"
+    ],
+    "topic": "ai_strategy"
+  },
+  {
+    "id": "TCS-RET-002",
+    "question": "How does TCS describe its full-stack AI services approach?",
+    "source_doc": "tcs_annual_report_2025_26.pdf",
+    "expected_pages": [12],
+    "relevant_chunk_ids": [
+      "tcs_annual_report_2025_26.pdf:page-12:chunk-2"
+    ],
+    "topic": "ai_services"
+  },
+  {
+    "id": "TCS-RET-003",
+    "question": "What AI capabilities and partnerships is TCS developing to support clients?",
+    "source_doc": "tcs_annual_report_2025_26.pdf",
+    "expected_pages": [14, 62],
+    "relevant_chunk_ids": [
+      "tcs_annual_report_2025_26.pdf:page-14:chunk-2",
+      "tcs_annual_report_2025_26.pdf:page-14:chunk-3",
+      "tcs_annual_report_2025_26.pdf:page-62:chunk-1",
+      "tcs_annual_report_2025_26.pdf:page-62:chunk-2"
+    ],
+    "topic": "ai_capabilities"
+  },
+  {
+    "id": "TCS-RET-004",
+    "question": "How does TCS help clients modernise enterprise technology stacks using AI?",
+    "source_doc": "tcs_annual_report_2025_26.pdf",
+    "expected_pages": [14],
+    "topic": "ai_modernisation"
+  },
+  {
+    "id": "TCS-RET-005",
+    "question": "What does TCS say about trust, security, and sovereignty in AI deployments?",
+    "source_doc": "tcs_annual_report_2025_26.pdf",
+    "expected_pages": [12],
+    "topic": "ai_trust"
+  },
+  {
+    "id": "TCS-RET-006",
+    "question": "How is TCS using AI to transform client services and enterprise operations?",
+    "source_doc": "tcs_annual_report_2025_26.pdf",
+    "expected_pages": [12, 54],
+    "topic": "ai_transformation"
+  },
+  {
+    "id": "TCS-RET-007",
+    "question": "How does TCS's customer-centric strategy contribute to sustainable business growth?",
+    "source_doc": "tcs_annual_report_2025_26.pdf",
+    "expected_pages": [54],
+    "relevant_chunk_ids": [
+      "tcs_annual_report_2025_26.pdf:page-54:chunk-2"
+    ],
+    "topic": "customer_centric_growth"
+  },
+  {
+    "id": "TCS-RET-008",
+    "question": "How does TCS invest in talent development and workforce readiness?",
+    "source_doc": "tcs_annual_report_2025_26.pdf",
+    "expected_pages": [55],
+    "topic": "talent_development"
+  },
+  {
+    "id": "TCS-RET-009",
+    "question": "Which strategic collaborations did TCS expand in FY2026, and what companies did it acquire to strengthen its Salesforce and AI consulting capabilities?",
+    "source_doc": "tcs_annual_report_2025_26.pdf",
+    "expected_pages": [14],
+    "relevant_chunk_ids": [
+      "tcs_annual_report_2025_26.pdf:page-14:chunk-3"
+    ],
+    "topic": "ai_partnerships_acquisitions"
+  },
+  {
+    "id": "TCS-RET-010",
+    "question": "What financial performance highlights does TCS report for FY2026?",
+    "source_doc": "tcs_annual_report_2025_26.pdf",
+    "expected_pages": [58],
+    "relevant_chunk_ids": [
+      "tcs_annual_report_2025_26.pdf:page-58:chunk-1"
+    ],
+    "topic": "financial_performance"
+  }
+]
+
