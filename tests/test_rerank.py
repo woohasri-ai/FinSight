@@ -106,3 +106,26 @@ def test_rerank_chunks_limits_results_and_preserves_metadata(
     assert results[0]["source_doc"] == "report.pdf"
     assert results[0]["page_number"] == 10
     assert results[0]["text"] == "TCS revenue increased"
+
+
+def test_rerank_chunks_rejects_mismatched_score_count(
+    sample_chunks: list[dict[str, int | float | str]],
+) -> None:
+    class BrokenReranker:
+        def predict(
+            self,
+            sentences: list[tuple[str, str]],
+            show_progress_bar: bool = False,
+        ) -> np.ndarray:
+            return np.array([0.9], dtype=np.float32)
+
+    with pytest.raises(
+        ValueError,
+        match="Reranker must return one score per chunk",
+    ):
+        rerank_chunks(
+            "What is relevant?",
+            sample_chunks,
+            BrokenReranker(),  # type: ignore[arg-type]
+            top_k=2,
+        )
