@@ -134,5 +134,15 @@
       "tcs_annual_report_2025_26.pdf:page-56:chunk-1"
     ],
     "topic": "research_innovation"
-  }
+  },
+  {
+  "id": "TCS-RET-014",
+  "question": "What was TCS's voluntary IT services attrition rate in FY 2026?",
+  "source_doc": "tcs_annual_report_2025_26.pdf",
+  "expected_pages": [55],
+  "relevant_chunk_ids": [
+    "tcs_annual_report_2025_26.pdf:page-55:chunk-2"
+  ],
+  "topic": "workforce_attrition"
+}
 ]
