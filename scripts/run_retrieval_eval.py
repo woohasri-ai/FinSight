@@ -1,12 +1,18 @@
 import argparse
 import json
+from collections.abc import Sequence
+from math import log2
 from pathlib import Path
 from typing import Any
 
 import numpy as np
 
-from finsight.retrieval.bm25 import build_bm25_index
-from finsight.retrieval.dense import load_embedding_model, load_saved_embeddings
+from finsight.retrieval.bm25 import build_bm25_index, search_bm25
+from finsight.retrieval.dense import (
+    load_embedding_model,
+    load_saved_embeddings,
+    search_chunks,
+)
 from finsight.retrieval.hybrid import hybrid_search
 from finsight.retrieval.rerank import load_reranker, rerank_chunks
 
@@ -19,6 +25,7 @@ GOLDEN_SET_PATH = PROJECT_ROOT / "data" / "eval" / "retrieval_golden_set.json"
 CANDIDATE_K = 50
 HYBRID_CUTOFFS = (5, 10, 50)
 RERANK_TOP_K = 10
+RANKING_METRIC_K = 10
 DIAGNOSTIC_QUESTION_ID = "TCS-RET-003"
 
 
@@ -75,6 +82,63 @@ def chunk_recall_at_k(
     return len(found_ids) / len(expected_ids)
 
 
+def reciprocal_rank(
+    results: Sequence[dict[str, Any]],
+    relevant_chunk_ids: set[str],
+    k: int = RANKING_METRIC_K,
+) -> float:
+    """Calculate reciprocal rank of the first relevant chunk within top k."""
+    if k < 1:
+        raise ValueError("k must be at least 1.")
+
+    if not relevant_chunk_ids:
+        return 0.0
+
+    for rank, result in enumerate(results[:k], start=1):
+        if str(result["chunk_id"]) in relevant_chunk_ids:
+            return 1.0 / rank
+
+    return 0.0
+
+
+def ndcg_at_k(
+    results: Sequence[dict[str, Any]],
+    relevant_chunk_ids: set[str],
+    k: int = RANKING_METRIC_K,
+) -> float:
+    """Calculate NDCG@k using binary chunk relevance."""
+    if k < 1:
+        raise ValueError("k must be at least 1.")
+
+    if not relevant_chunk_ids:
+        return 0.0
+
+    # Each relevant chunk has gain 1; non-relevant chunks have gain 0.
+    dcg = 0.0
+    seen_chunk_ids: set[str] = set()
+
+    for rank, result in enumerate(results[:k], start=1):
+        chunk_id = str(result["chunk_id"])
+
+        # Avoid counting a duplicated chunk more than once.
+        if chunk_id in seen_chunk_ids:
+            continue
+        seen_chunk_ids.add(chunk_id)
+
+        if chunk_id in relevant_chunk_ids:
+            dcg += 1.0 / log2(rank + 1)
+
+    # The ideal ranking puts as many distinct relevant chunks as possible
+    # at the top, up to k positions.
+    ideal_relevant_count = min(len(relevant_chunk_ids), k)
+    ideal_dcg = sum(1.0 / log2(rank + 1) for rank in range(1, ideal_relevant_count + 1))
+
+    if ideal_dcg == 0.0:
+        return 0.0
+
+    return dcg / ideal_dcg
+
+
 def load_json(path: Path) -> Any:
     """Load JSON data with a clear error if the file is missing."""
     if not path.is_file():
@@ -82,6 +146,64 @@ def load_json(path: Path) -> Any:
 
     with path.open("r", encoding="utf-8") as file:
         return json.load(file)
+
+
+def print_relevant_chunk_ranks(
+    relevant_chunk_ids: list[str],
+    dense_results: list[dict[str, Any]],
+    bm25_results: list[dict[str, Any]],
+    hybrid_results: list[dict[str, Any]],
+) -> None:
+    """Compare the ranks of labeled relevant chunks across retrievers."""
+    relevant_ids = set(relevant_chunk_ids)
+
+    if not relevant_ids:
+        print("No labeled relevant chunk IDs are available for diagnosis.")
+        return
+
+    rankings = {
+        "Dense": dense_results,
+        "BM25": bm25_results,
+        "Hybrid": hybrid_results,
+    }
+
+    rank_maps: dict[str, dict[str, int]] = {
+        name: {str(result["chunk_id"]): rank for rank, result in enumerate(results, start=1)}
+        for name, results in rankings.items()
+    }
+
+    print("\nDiagnostic: relevant chunk ranks by retriever")
+    print("-" * 110)
+    print(f"{'Page':<7} {'Chunk ID':<48} {'Dense rank':<13} {'BM25 rank':<13} {'Hybrid rank':<13}")
+    print("-" * 110)
+
+    for chunk_id in sorted(relevant_ids):
+        page_number = next(
+            (
+                int(result["page_number"])
+                for results in rankings.values()
+                for result in results
+                if str(result["chunk_id"]) == chunk_id
+            ),
+            None,
+        )
+
+        page_display = str(page_number) if page_number is not None else "Unknown"
+
+        rank_displays = []
+        for name in ("Dense", "BM25", "Hybrid"):
+            rank = rank_maps[name].get(chunk_id)
+            rank_displays.append(str(rank) if rank is not None else "Not in top 50")
+
+        print(
+            f"{page_display:<7} {chunk_id:<48} "
+            f"{rank_displays[0]:<13} "
+            f"{rank_displays[1]:<13} "
+            f"{rank_displays[2]:<13}"
+        )
+
+    print("-" * 110)
+    print("Ranks are measured within each retriever's returned candidate list.")
 
 
 def diagnose_relevant_chunks(
@@ -117,9 +239,8 @@ def diagnose_relevant_chunks(
 
     if missing_candidates:
         print(f"Relevant chunks missing from hybrid candidates: {sorted(missing_candidates)}")
-        return
-
-    print("All labeled relevant chunks are present in hybrid candidates.")
+    else:
+        print("All labeled relevant chunks are present in hybrid candidates.")
 
     # Diagnostic only: rerank the complete hybrid candidate pool.
     diagnostic_results = rerank_chunks(
@@ -188,17 +309,20 @@ def main() -> None:
         print("\nLoading reranker...")
         reranker = load_reranker()
 
-    metric_totals = {
-        **{f"hybrid_recall@{k}": 0.0 for k in HYBRID_CUTOFFS},
-    }
+    metric_totals = {f"hybrid_recall@{k}": 0.0 for k in HYBRID_CUTOFFS}
 
-    chunk_metric_totals = {
-        **{f"hybrid_chunk_recall@{k}": 0.0 for k in HYBRID_CUTOFFS},
+    chunk_metric_totals = {f"hybrid_chunk_recall@{k}": 0.0 for k in HYBRID_CUTOFFS}
+
+    ranking_metric_totals = {
+        f"hybrid_mrr@{RANKING_METRIC_K}": 0.0,
+        f"hybrid_ndcg@{RANKING_METRIC_K}": 0.0,
     }
 
     if run_reranker:
         metric_totals[f"reranked_recall@{RERANK_TOP_K}"] = 0.0
         chunk_metric_totals[f"reranked_chunk_recall@{RERANK_TOP_K}"] = 0.0
+        ranking_metric_totals[f"reranked_mrr@{RANKING_METRIC_K}"] = 0.0
+        ranking_metric_totals[f"reranked_ndcg@{RANKING_METRIC_K}"] = 0.0
 
     chunk_evaluated_questions = 0
 
@@ -207,6 +331,7 @@ def main() -> None:
         query = question["question"]
         expected_pages = [int(page) for page in question["expected_pages"]]
         relevant_chunk_ids = question.get("relevant_chunk_ids", [])
+        relevant_ids = set(relevant_chunk_ids)
 
         print(f"\n{question_id}: {query}")
         print(f"  Expected pages: {expected_pages}")
@@ -224,6 +349,28 @@ def main() -> None:
             candidate_k=CANDIDATE_K,
         )
 
+        if question_id == DIAGNOSTIC_QUESTION_ID:
+            dense_results = search_chunks(
+                query=query,
+                chunks=chunks,
+                model=embedding_model,
+                top_k=CANDIDATE_K,
+                chunk_embeddings=embeddings,
+            )
+            bm25_results = search_bm25(
+                query=query,
+                chunks=chunks,
+                index=bm25_index,
+                top_k=CANDIDATE_K,
+            )
+
+            print_relevant_chunk_ranks(
+                relevant_chunk_ids=relevant_chunk_ids,
+                dense_results=dense_results,
+                bm25_results=bm25_results,
+                hybrid_results=hybrid_results,
+            )
+
         if not hybrid_results:
             print("  No hybrid results returned.")
 
@@ -239,8 +386,13 @@ def main() -> None:
                 for k in HYBRID_CUTOFFS:
                     chunk_metric_totals[f"hybrid_chunk_recall@{k}"] += 0.0
 
+                ranking_metric_totals[f"hybrid_mrr@{RANKING_METRIC_K}"] += 0.0
+                ranking_metric_totals[f"hybrid_ndcg@{RANKING_METRIC_K}"] += 0.0
+
                 if run_reranker:
                     chunk_metric_totals[f"reranked_chunk_recall@{RERANK_TOP_K}"] += 0.0
+                    ranking_metric_totals[f"reranked_mrr@{RANKING_METRIC_K}"] += 0.0
+                    ranking_metric_totals[f"reranked_ndcg@{RANKING_METRIC_K}"] += 0.0
 
             continue
 
@@ -260,6 +412,24 @@ def main() -> None:
                 )
                 chunk_metric_totals[f"hybrid_chunk_recall@{k}"] += chunk_score
                 print(f"  Hybrid Chunk Recall@{k}: {chunk_score:.2f}")
+
+        if relevant_chunk_ids:
+            hybrid_mrr = reciprocal_rank(
+                hybrid_results,
+                relevant_ids,
+                RANKING_METRIC_K,
+            )
+            hybrid_ndcg = ndcg_at_k(
+                hybrid_results,
+                relevant_ids,
+                RANKING_METRIC_K,
+            )
+
+            ranking_metric_totals[f"hybrid_mrr@{RANKING_METRIC_K}"] += hybrid_mrr
+            ranking_metric_totals[f"hybrid_ndcg@{RANKING_METRIC_K}"] += hybrid_ndcg
+
+            print(f"  Hybrid MRR@{RANKING_METRIC_K}: {hybrid_mrr:.3f}")
+            print(f"  Hybrid NDCG@{RANKING_METRIC_K}: {hybrid_ndcg:.3f}")
 
         if not run_reranker:
             if relevant_chunk_ids:
@@ -302,7 +472,23 @@ def main() -> None:
             )
             chunk_metric_totals[f"reranked_chunk_recall@{RERANK_TOP_K}"] += reranked_chunk_score
 
+            reranked_mrr = reciprocal_rank(
+                reranked_results,
+                relevant_ids,
+                RANKING_METRIC_K,
+            )
+            reranked_ndcg = ndcg_at_k(
+                reranked_results,
+                relevant_ids,
+                RANKING_METRIC_K,
+            )
+
+            ranking_metric_totals[f"reranked_mrr@{RANKING_METRIC_K}"] += reranked_mrr
+            ranking_metric_totals[f"reranked_ndcg@{RANKING_METRIC_K}"] += reranked_ndcg
+
             print(f"  Reranked Chunk Recall@{RERANK_TOP_K}: {reranked_chunk_score:.2f}")
+            print(f"  Reranked MRR@{RANKING_METRIC_K}: {reranked_mrr:.3f}")
+            print(f"  Reranked NDCG@{RANKING_METRIC_K}: {reranked_ndcg:.3f}")
 
             chunk_evaluated_questions += 1
 
@@ -322,6 +508,12 @@ def main() -> None:
         print(f"Questions evaluated for chunk relevance: {chunk_evaluated_questions}")
 
         for metric_name, total in chunk_metric_totals.items():
+            average = total / chunk_evaluated_questions
+            print(f"{metric_name}: {average:.3f} ({total:.2f}/{chunk_evaluated_questions})")
+
+        print("\n=== Aggregate ranking results ===")
+
+        for metric_name, total in ranking_metric_totals.items():
             average = total / chunk_evaluated_questions
             print(f"{metric_name}: {average:.3f} ({total:.2f}/{chunk_evaluated_questions})")
 
