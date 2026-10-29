@@ -19,7 +19,7 @@ GOLDEN_SET_PATH = PROJECT_ROOT / "data" / "eval" / "retrieval_golden_set.json"
 CANDIDATE_K = 50
 HYBRID_CUTOFFS = (5, 10, 50)
 RERANK_TOP_K = 10
-DIAGNOSTIC_QUESTION_ID = "TCS-RET-009"
+DIAGNOSTIC_QUESTION_ID = "TCS-RET-003"
 
 
 def parse_args() -> argparse.Namespace:
@@ -70,7 +70,6 @@ def chunk_recall_at_k(
         return 0.0
 
     retrieved_ids = {str(result["chunk_id"]) for result in results[:k] if "chunk_id" in result}
-
     found_ids = retrieved_ids & expected_ids
 
     return len(found_ids) / len(expected_ids)
@@ -91,7 +90,7 @@ def diagnose_relevant_chunks(
     relevant_chunk_ids: list[str],
     reranker: Any,
 ) -> None:
-    """Print hybrid and full-pool reranker ranks for labeled relevant chunks."""
+    """Print top reranked candidates and identify labeled relevant chunks."""
     relevant_ids = set(relevant_chunk_ids)
 
     if not relevant_ids:
@@ -122,7 +121,7 @@ def diagnose_relevant_chunks(
 
     print("All labeled relevant chunks are present in hybrid candidates.")
 
-    # Diagnostic only: inspect the complete candidate pool.
+    # Diagnostic only: rerank the complete hybrid candidate pool.
     diagnostic_results = rerank_chunks(
         query=query,
         chunks=hybrid_results,
@@ -130,26 +129,24 @@ def diagnose_relevant_chunks(
         top_k=len(hybrid_results),
     )
 
-    print("\nDiagnostic: relevant chunks after reranking")
+    print("\nDiagnostic: top 15 reranked candidates")
 
-    found_reranked_ids: set[str] = set()
-
-    for rank, result in enumerate(diagnostic_results, start=1):
+    for rank, result in enumerate(diagnostic_results[:15], start=1):
         chunk_id = str(result["chunk_id"])
+        relevance = "RELEVANT" if chunk_id in relevant_ids else "not labeled relevant"
 
-        if chunk_id in relevant_ids:
-            found_reranked_ids.add(chunk_id)
-            print(
-                f"Reranker rank: {rank} | "
-                f"Page: {result['page_number']} | "
-                f"Chunk: {chunk_id} | "
-                f"Reranker score: {result['score']:.4f}"
-            )
+        text_preview = " ".join(str(result["text"]).split())
+        if len(text_preview) > 220:
+            text_preview = text_preview[:220] + "..."
 
-    missing_after_reranking = relevant_ids - found_reranked_ids
-
-    if missing_after_reranking:
-        print(f"Relevant chunks missing from reranker output: {sorted(missing_after_reranking)}")
+        print(
+            f"\nRank: {rank} | "
+            f"Page: {result['page_number']} | "
+            f"Chunk: {chunk_id} | "
+            f"Reranker score: {result['score']:.4f} | "
+            f"{relevance}"
+        )
+        print(f"Preview: {text_preview}")
 
 
 def main() -> None:
@@ -269,7 +266,6 @@ def main() -> None:
                 chunk_evaluated_questions += 1
             continue
 
-        # The reranker is guaranteed to be loaded when run_reranker is True.
         assert reranker is not None
 
         reranked_results = rerank_chunks(

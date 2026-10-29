@@ -1,3 +1,4 @@
+
 [
   {
     "id": "TCS-RET-001",
@@ -21,7 +22,7 @@
   },
   {
     "id": "TCS-RET-003",
-    "question": "What AI capabilities and partnerships is TCS developing to support clients?",
+    "question": "What AI capabilities, strategic partnerships, and acquisitions is TCS developing to support clients?",
     "source_doc": "tcs_annual_report_2025_26.pdf",
     "expected_pages": [14, 62],
     "relevant_chunk_ids": [
@@ -37,6 +38,9 @@
     "question": "How does TCS help clients modernise enterprise technology stacks using AI?",
     "source_doc": "tcs_annual_report_2025_26.pdf",
     "expected_pages": [14],
+    "relevant_chunk_ids": [
+      "tcs_annual_report_2025_26.pdf:page-14:chunk-2"
+    ],
     "topic": "ai_modernisation"
   },
   {
@@ -44,6 +48,9 @@
     "question": "What does TCS say about trust, security, and sovereignty in AI deployments?",
     "source_doc": "tcs_annual_report_2025_26.pdf",
     "expected_pages": [12],
+    "relevant_chunk_ids": [
+      "tcs_annual_report_2025_26.pdf:page-12:chunk-2"
+    ],
     "topic": "ai_trust"
   },
   {
@@ -51,6 +58,10 @@
     "question": "How is TCS using AI to transform client services and enterprise operations?",
     "source_doc": "tcs_annual_report_2025_26.pdf",
     "expected_pages": [12, 54],
+    "relevant_chunk_ids": [
+      "tcs_annual_report_2025_26.pdf:page-12:chunk-2",
+      "tcs_annual_report_2025_26.pdf:page-54:chunk-2"
+    ],
     "topic": "ai_transformation"
   },
   {
@@ -68,6 +79,10 @@
     "question": "How does TCS invest in talent development and workforce readiness?",
     "source_doc": "tcs_annual_report_2025_26.pdf",
     "expected_pages": [55],
+    "relevant_chunk_ids": [
+      "tcs_annual_report_2025_26.pdf:page-55:chunk-1",
+      "tcs_annual_report_2025_26.pdf:page-55:chunk-2"
+    ],
     "topic": "talent_development"
   },
   {
@@ -89,6 +104,25 @@
       "tcs_annual_report_2025_26.pdf:page-58:chunk-1"
     ],
     "topic": "financial_performance"
+  },
+  {
+    "id": "TCS-RET-011",
+    "question": "What were TCS's revenue from operations, EBIT, and profit after tax in FY2026?",
+    "source_doc": "tcs_annual_report_2025_26.pdf",
+    "expected_pages": [58],
+    "relevant_chunk_ids": [
+      "tcs_annual_report_2025_26.pdf:page-58:chunk-1"
+    ],
+    "topic": "financial_performance"
+  },
+  {
+    "id": "TCS-RET-012",
+    "question": "How did TCS's reported revenue growth, constant-currency growth, and EBIT margin change in FY2026 compared with the previous year?",
+    "source_doc": "tcs_annual_report_2025_26.pdf",
+    "expected_pages": [58],
+    "relevant_chunk_ids": [
+      "tcs_annual_report_2025_26.pdf:page-58:chunk-2"
+    ],
+    "topic": "revenue_growth_and_margins"
   }
 ]
-
