@@ -124,5 +124,15 @@
       "tcs_annual_report_2025_26.pdf:page-58:chunk-2"
     ],
     "topic": "revenue_growth_and_margins"
+  },
+    {
+    "id": "TCS-RET-013",
+    "question": "How much did TCS invest in research and innovation during FY 2026, and what percentage of revenue did it represent?",
+    "source_doc": "tcs_annual_report_2025_26.pdf",
+    "expected_pages": [56],
+    "relevant_chunk_ids": [
+      "tcs_annual_report_2025_26.pdf:page-56:chunk-1"
+    ],
+    "topic": "research_innovation"
   }
 ]
