@@ -144,5 +144,28 @@
     "tcs_annual_report_2025_26.pdf:page-55:chunk-2"
   ],
   "topic": "workforce_attrition"
+},
+  {
+    "id": "TCS-RET-015",
+    "question": "How many learning hours did TCS invest in FY2026, and how many competencies did employees acquire?",
+    "source_doc": "tcs_annual_report_2025_26.pdf",
+    "expected_pages": [
+      9
+    ],
+    "relevant_chunk_ids": [
+      "tcs_annual_report_2025_26.pdf:page-9:chunk-2",
+      "tcs_annual_report_2025_26.pdf:page-9:chunk-3"
+    ],
+    "topic": "talent_development"
+  },
+  {
+  "id": "TCS-RET-016",
+  "question": "What was TCS's total employee strength in FY2026, and how many freshers did it hire?",
+  "source_doc": "tcs_annual_report_2025_26.pdf",
+  "expected_pages": [25],
+  "relevant_chunk_ids": [
+    "tcs_annual_report_2025_26.pdf:page-25:chunk-1"
+  ],
+  "topic": "workforce_and_hiring"
 }
 ]
