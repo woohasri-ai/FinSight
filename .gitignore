@@ -30,5 +30,9 @@ Thumbs.db
 data/raw/
 data/processed/
 data/eval/*.json
+!data/eval/answer_golden_set.json
 !data/eval/retrieval_golden_set.json
 data/eval/retrieval_eval_output.txt
+
+# Local runtime logs
+*.log

@@ -1,4 +1,3 @@
-
 import pytest
 
 from finsight.sql.database import get_connection, initialize_database
@@ -57,9 +56,7 @@ def test_insert_verified_fact_does_not_commit_automatically(tmp_path):
         insert_test_fact(connection)
         connection.rollback()
 
-        result = connection.execute(
-            "SELECT COUNT(*) FROM verified_facts"
-        ).fetchone()
+        result = connection.execute("SELECT COUNT(*) FROM verified_facts").fetchone()
     finally:
         connection.close()
 
@@ -235,9 +232,7 @@ def test_get_verified_facts_returns_all_verified_employee_categories(tmp_path):
         connection.close()
 
     assert len(results) == 3
-    retrieved_facts = {
-        fact["category"]: fact["value"] for fact in results
-    }
+    retrieved_facts = {fact["category"]: fact["value"] for fact in results}
 
     assert retrieved_facts["permanent"] == 584519
     assert retrieved_facts["other_than_permanent"] == 32918

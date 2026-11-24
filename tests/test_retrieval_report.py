@@ -1,6 +1,5 @@
-
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
@@ -36,9 +35,7 @@ def sample_report():
                 "hybrid_recall@5": 0.5,
             },
         ],
-        run_timestamp=datetime(
-            2026, 11, 1, 10, 30, 0, tzinfo=timezone.utc
-        ),
+        run_timestamp=datetime(2026, 11, 1, 10, 30, 0, tzinfo=UTC),
     )
 
 

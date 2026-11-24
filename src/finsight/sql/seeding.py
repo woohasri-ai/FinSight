@@ -1,10 +1,8 @@
-
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from finsight.sql.database import get_connection, initialize_database
 from finsight.sql.repository import insert_verified_fact
-
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 DATABASE_PATH = PROJECT_ROOT / "data" / "processed" / "finsight.db"
@@ -119,10 +117,7 @@ def seed_verified_facts(
             ).fetchall()
 
             if len(existing) > 1:
-                raise ValueError(
-                    f"Duplicate database records found for "
-                    f"{fact['category']}."
-                )
+                raise ValueError(f"Duplicate database records found for {fact['category']}.")
 
             if existing:
                 record = existing[0]
@@ -134,10 +129,7 @@ def seed_verified_facts(
                             f"{fact['category']}: {field} does not match."
                         )
 
-                metadata_changed = any(
-                    record[field] != fact[field]
-                    for field in provenance_fields
-                )
+                metadata_changed = any(record[field] != fact[field] for field in provenance_fields)
 
                 verification_changed = (
                     record["verification_status"] != "verified"
@@ -148,9 +140,7 @@ def seed_verified_facts(
                     verified_at = record["verified_at"]
 
                     if not verified_at:
-                        verified_at = datetime.now(
-                            timezone.utc
-                        ).isoformat()
+                        verified_at = datetime.now(UTC).isoformat()
 
                     connection.execute(
                         """
@@ -190,7 +180,7 @@ def seed_verified_facts(
 
                 continue
 
-            verified_at = datetime.now(timezone.utc).isoformat()
+            verified_at = datetime.now(UTC).isoformat()
 
             insert_verified_fact(
                 connection,
@@ -198,10 +188,7 @@ def seed_verified_facts(
                 verified_at=verified_at,
             )
 
-            print(
-                f"Inserted and verified: {fact['category']} = "
-                f"{fact['value']:,}"
-            )
+            print(f"Inserted and verified: {fact['category']} = {fact['value']:,}")
             inserted += 1
 
         connection.commit()

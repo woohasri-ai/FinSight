@@ -1,7 +1,6 @@
-
 import json
 import re
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -23,12 +22,12 @@ def build_retrieval_report(
     if chunk_count < 0:
         raise ValueError("chunk_count must not be negative.")
 
-    timestamp = run_timestamp or datetime.now(timezone.utc)
+    timestamp = run_timestamp or datetime.now(UTC)
 
     if timestamp.tzinfo is None or timestamp.utcoffset() is None:
         raise ValueError("run_timestamp must be timezone-aware.")
 
-    timestamp = timestamp.astimezone(timezone.utc)
+    timestamp = timestamp.astimezone(UTC)
 
     run_id = timestamp.strftime("%Y%m%dT%H%M%S%fZ")
 
@@ -87,9 +86,7 @@ def save_retrieval_report(
 
         # Avoid replacing an existing report.
         if output_path.exists():
-            raise FileExistsError(
-                f"Evaluation report already exists: {output_path}"
-            )
+            raise FileExistsError(f"Evaluation report already exists: {output_path}")
 
         temporary_path.replace(output_path)
 

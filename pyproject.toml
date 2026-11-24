@@ -5,15 +5,21 @@ version = "0.1.0"
 description = "Agentic RAG and text-to-SQL financial analyst for Indian IT annual reports"
 requires-python = ">=3.11,<3.12"
 dependencies = [
+    "fastapi>=0.162.0",
+    "httpx>=0.28.1",
+    "pydantic>=2,<3",
     "pymupdf>=2.0",
     "rank-bm25>=0.2.2",
     "sentence-transformers>=6.2.0",
+    "streamlit>=1.66.1",
     "tokenizers>=0.23.3",
+    "uvicorn[standard]>=0.54.0",
 ]
 
 [dependency-groups]
 dev = [
     "pytest>=9.0",
+    "pytest-asyncio>=1.4.1",
     "ruff>=0.17",
 ]
 

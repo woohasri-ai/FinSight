@@ -1,6 +1,4 @@
-
 import sqlite3
-
 
 VALID_VERIFICATION_STATUSES = {"verified", "unverified"}
 
@@ -30,19 +28,13 @@ def insert_verified_fact(
     """
 
     if verification_status not in VALID_VERIFICATION_STATUSES:
-        raise ValueError(
-            "verification_status must be 'verified' or 'unverified'."
-        )
+        raise ValueError("verification_status must be 'verified' or 'unverified'.")
 
     if verification_status == "verified":
         if not verified_at or not verified_by:
-            raise ValueError(
-                "Verified facts require both verified_at and verified_by."
-            )
+            raise ValueError("Verified facts require both verified_at and verified_by.")
     elif verified_at is not None or verified_by is not None:
-        raise ValueError(
-            "Unverified facts cannot have verified_at or verified_by."
-        )
+        raise ValueError("Unverified facts cannot have verified_at or verified_by.")
 
     cursor = connection.execute(
         """

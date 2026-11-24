@@ -1,12 +1,9 @@
-
 import sqlite3
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 
-DEFAULT_DATABASE_PATH = (
-    PROJECT_ROOT / "data" / "processed" / "finsight.db"
-)
+DEFAULT_DATABASE_PATH = PROJECT_ROOT / "data" / "processed" / "finsight.db"
 
 DEFAULT_SCHEMA_PATH = Path(__file__).with_name("schema.sql")
 
@@ -39,9 +36,7 @@ def initialize_database(
 
         columns = {
             row["name"]
-            for row in connection.execute(
-                "PRAGMA table_info(verified_facts)"
-            ).fetchall()
+            for row in connection.execute("PRAGMA table_info(verified_facts)").fetchall()
         }
 
         migrations = {

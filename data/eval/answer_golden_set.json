@@ -1,0 +1,91 @@
+[
+  {
+    "id": "TCS-ANS-001",
+    "question": "What was TCS's total employee strength in FY2026?",
+    "source_doc": "tcs_annual_report_2025_26.pdf",
+    "expected_answer": "TCS reported a total employee strength of 617,437 in FY2026, comprising 584,519 permanent employees and 32,918 other-than-permanent employees.",
+    "required_facts": [
+      "Total employee strength: 617,437",
+      "Permanent employees: 584,519",
+      "Other-than-permanent employees: 32,918"
+    ],
+    "expected_citations": [
+      {
+        "page_number": 108
+      }
+    ],
+    "answerable": true,
+    "topic": "workforce_and_hiring"
+  },
+  {
+    "id": "TCS-ANS-002",
+    "question": "How many learning hours did TCS employees complete, and how many competencies did they acquire in FY2026?",
+    "source_doc": "tcs_annual_report_2025_26.pdf",
+    "expected_answer": "TCS reported 69 million learning hours and enabled 5.2 million competencies to be acquired in FY2026.",
+    "required_facts": [
+      "Learning hours: 69 million",
+      "Competencies acquired: 5.2 million"
+    ],
+    "expected_citations": [
+      {
+        "page_number": 9
+      }
+    ],
+    "answerable": true,
+    "topic": "learning_and_development"
+  },
+  {
+    "id": "TCS-ANS-003",
+    "question": "What was TCS's exact monthly employee attrition rate in January 2026?",
+    "source_doc": "tcs_annual_report_2025_26.pdf",
+    "expected_answer": "The annual report does not provide an exact monthly employee attrition rate for January 2026.",
+    "required_facts": [],
+    "expected_citations": [],
+    "answerable": false,
+    "topic": "employee_attrition"
+  },
+  {
+    "id": "TCS-ANS-004",
+    "question": "How many employees resigned specifically from TCS's Hyderabad office in FY2026?",
+    "source_doc": "tcs_annual_report_2025_26.pdf",
+    "expected_answer": "The report does not provide a Hyderabad-office-specific employee resignation count for FY2026.",
+    "required_facts": [],
+    "expected_citations": [],
+    "answerable": false,
+    "topic": "location_specific_attrition"
+  },
+  {
+    "id": "TCS-ANS-005",
+    "question": "What were TCS's revenue from operations, EBIT, and profit after tax in FY2026?",
+    "source_doc": "tcs_annual_report_2025_26.pdf",
+    "expected_answer": "In FY2026, TCS reported consolidated revenue from operations of ₹267,021 crore, EBIT before other income of ₹66,838 crore, and profit after tax attributable to shareholders of ₹52,820 crore.",
+    "required_facts": [
+      "Revenue from operations: ₹267,021 crore",
+      "EBIT before other income: ₹66,838 crore",
+      "Profit after tax attributable to shareholders: ₹52,820 crore"
+    ],
+    "expected_citations": [
+      {
+        "page_number": 58
+      }
+    ],
+    "answerable": true,
+    "topic": "financial_performance"
+  },
+  {
+    "id": "TCS-ANS-006",
+    "question": "How many freshers did TCS hire in FY2026?",
+    "source_doc": "tcs_annual_report_2025_26.pdf",
+    "expected_answer": "TCS hired more than 44,000 freshers in FY2026.",
+    "required_facts": [
+      "Fresher hiring: 44,000+"
+    ],
+    "expected_citations": [
+      {
+        "page_number": 25
+      }
+    ],
+    "answerable": true,
+    "topic": "workforce_and_hiring"
+  }
+]

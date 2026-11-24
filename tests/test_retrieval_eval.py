@@ -1,14 +1,9 @@
-
 import importlib.util
 from pathlib import Path
 
 import pytest
 
-SCRIPT_PATH = (
-    Path(__file__).resolve().parents[1]
-    / "scripts"
-    / "run_retrieval_eval.py"
-)
+SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "run_retrieval_eval.py"
 SPEC = importlib.util.spec_from_file_location(
     "run_retrieval_eval",
     SCRIPT_PATH,
@@ -26,6 +21,7 @@ ndcg_at_k = MODULE.ndcg_at_k
 
 
 # Page-level Recall@K
+
 
 def test_recall_at_k_returns_one_when_all_expected_pages_are_found():
     results = [
@@ -91,6 +87,7 @@ def test_recall_at_k_rejects_invalid_cutoff(k):
 
 
 # Chunk-level Recall@K
+
 
 def test_chunk_recall_at_k_returns_one_when_all_relevant_chunks_are_found():
     results = [
@@ -167,6 +164,7 @@ def test_chunk_recall_at_k_rejects_invalid_cutoff(k):
 
 # Mean Reciprocal Rank
 
+
 def test_reciprocal_rank_returns_one_for_first_result():
     results = [
         {"chunk_id": "a"},
@@ -223,6 +221,7 @@ def test_reciprocal_rank_rejects_invalid_cutoff(k):
 
 
 # Normalized Discounted Cumulative Gain
+
 
 def test_ndcg_returns_one_for_ideal_ranking():
     results = [
