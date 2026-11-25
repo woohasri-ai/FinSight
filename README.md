@@ -12,6 +12,12 @@ It combines Retrieval-Augmented Generation (RAG), hybrid information retrieval, 
 
 FinSight aims to make financial research more accessible, traceable, and reliable by connecting natural-language questions with financial reports and structured company data.
 
+## 🚀 Live Demo
+
+**Try FinSight here:** [Launch FinSight](https://yes-containers-tool-facility.trycloudflare.com)
+
+> Note: This is a temporary Cloudflare demo link. The application is accessible while the hosting laptop and tunnel are running.
+
 ---
 
 ## Key Features
